@@ -27,7 +27,7 @@ function Process-Option {
         2 { Write-Host "Has seleccionado la Opción 2" }
         3 { Write-Host "Has seleccionado la Opción 3" }
         4 { Write-Host "Has seleccionado la Opción 4" }
-        0 { Write-Host "Saliendo..."; exit }
+        0 { Write-Host "Saliendo del programa..."; exit }
         default { Write-Host "Opción no válida. Inténtalo de nuevo." }
     }
 }
