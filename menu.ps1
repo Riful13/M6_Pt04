@@ -1,6 +1,9 @@
-# Archivo: /c:/Archivos Personales/aisx/m6/pureba.ps1
+# MENU GESTIÓN DE USUARIOS POWERSHELL
 
-Import-Module -Name "C:\Archivos Personales\aisx\m6\M6_Pt02\scripts\listUsers.ps1"
+# Rayan meddour
+# Izan Lanaspa
+# Sergi
+# Nacho de la Torre
 
 function Show-Menu {
     param (
