@@ -1,9 +1,50 @@
-# MENU GESTIÓN DE USUARIOS POWERSHELL
+# LIST USERS
+function Get-ListUsers {
+    Get-LocalUser | Select-Object Name, Enabled, LastLogon
+}
 
-# Rayan meddour
-# Izan Lanaspa
-# Sergi
-# Nacho de la Torre
+# CAMBIO DE PASSWORD
+function Cambiar-Contrasena {
+    param (
+        [string]$Username,
+        [string]$NewPassword
+    )
+
+    $User = Get-LocalUser -Name $Username
+    if ($User) {
+        $User | Set-LocalUser -Password (ConvertTo-SecureString $NewPassword -AsPlainText -Force)
+        Write-Host "Contraseña de $Username cambiada exitosamente."
+    } else {
+        Write-Host "Usuario $Username no encontrado."
+    }
+}
+
+# DROP USER
+function Drop-User {
+    param (
+        [string]$Username
+    )
+
+    $User = Get-LocalUser -Name $Username
+    if ($User) {
+        Remove-LocalUser -Name $Username
+        Write-Host "Usuario $Username eliminado exitosamente."
+    } else {
+        Write-Host "Usuario $Username no encontrado."
+    }
+}
+
+# NEW USER
+function CrearUsuario {
+    param (
+        [string]$Username,
+        [string]$Password
+    )
+
+    New-LocalUser -Name $Username -Password (ConvertTo-SecureString $Password -AsPlainText -Force) -FullName $Username -Description "Usuario creado por script"
+    Add-LocalGroupMember -Group "Users" -Member $Username
+    Write-Host "Usuario $Username creado exitosamente."
+}
 
 function Show-Menu {
     param (
@@ -69,55 +110,3 @@ do {
         Process-Option -Option $validatedSelection
     }
 } while ($validatedSelection -ne 0)
-
-# /***********************/
-# /*******SCRIPTS*********/
-# /***********************/
-
-# LIST USERS
-function Get-ListUsers {
-    Get-LocalUser | Select-Object Name, Enabled, LastLogon
-}
-
-# CAMBIO DE PASSWORD
-function Cambiar-Contrasena {
-    param (
-        [string]$Username,
-        [string]$NewPassword
-    )
-
-    $User = Get-LocalUser -Name $Username
-    if ($User) {
-        $User | Set-LocalUser -Password (ConvertTo-SecureString $NewPassword -AsPlainText -Force)
-        Write-Host "Contraseña de $Username cambiada exitosamente."
-    } else {
-        Write-Host "Usuario $Username no encontrado."
-    }
-}
-
-# DROP USER
-function Drop-User {
-    param (
-        [string]$Username
-    )
-
-    $User = Get-LocalUser -Name $Username
-    if ($User) {
-        Remove-LocalUser -Name $Username
-        Write-Host "Usuario $Username eliminado exitosamente."
-    } else {
-        Write-Host "Usuario $Username no encontrado."
-    }
-}
-
-# NEW USER
-function CrearUsuario {
-    param (
-        [string]$Username,
-        [string]$Password
-    )
-
-    New-LocalUser -Name $Username -Password (ConvertTo-SecureString $Password -AsPlainText -Force) -FullName $Username -Description "Usuario creado por script"
-    Add-LocalGroupMember -Group "Users" -Member $Username
-    Write-Host "Usuario $Username creado exitosamente."
-}
