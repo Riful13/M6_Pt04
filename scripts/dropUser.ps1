@@ -1,13 +1,13 @@
-# CambiarContrasena.ps1
-param (
-    [string]$Username,
-    [string]$NewPassword
-)
+function Drop-User {
+    param (
+        [string]$Username
+    )
 
-$User = Get-LocalUser -Name $Username
-if ($User) {
-    $User | Set-LocalUser -Password (ConvertTo-SecureString $NewPassword -AsPlainText -Force)
-    Write-Host "Contraseña de $Username cambiada exitosamente."
-} else {
-    Write-Host "Usuario $Username no encontrado."
+    $User = Get-LocalUser -Name $Username
+    if ($User) {
+        Remove-LocalUser -Name $Username
+        Write-Host "Usuario $Username eliminado exitosamente."
+    } else {
+        Write-Host "Usuario $Username no encontrado."
+    }
 }
