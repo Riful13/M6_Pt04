@@ -1,4 +1,4 @@
-# M6_Pt02
+# M6_Pt03
 1.- Script menú
 Heu de crear un script principal que funcioni com a menú. Aquest menú ha de permetre a l'usuari seleccionar entre quatre opcions diferents, amb l'objectiu d'executar un script secundari corresponent a cada opció. L’script menú ha de tenir una opció interactiva i també una opció automàtica en que ha de permetre executar-lo indicant l’opció del menú com a paràmetre a la línia de comandes.
 
