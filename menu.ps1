@@ -1,112 +1,68 @@
+#!/bin/bash
+
+# SCRIPT 1
 # LIST USERS
-function Get-ListUsers {
-    Get-LocalUser | Select-Object Name, Enabled, LastLogon
+function listar_usuarios {
+    cut -d: -f1 /etc/passwd
 }
 
+# SCRIPT 2
 # CAMBIO DE PASSWORD
-function Cambiar-Contrasena {
-    param (
-        [string]$Username,
-        [string]$NewPassword
-    )
-
-    $User = Get-LocalUser -Name $Username
-    if ($User) {
-        $User | Set-LocalUser -Password (ConvertTo-SecureString $NewPassword -AsPlainText -Force)
-        Write-Host "Contraseña de $Username cambiada exitosamente."
-    } else {
-        Write-Host "Usuario $Username no encontrado."
-    }
+function cambiar_contrasena {
+    read -p "Introduce el nombre de usuario: " username
+    read -s -p "Introduce la nueva contraseña: " password
+    echo
+    echo "$username:$password" | sudo chpasswd
+    echo "Contraseña de $username cambiada exitosamente."
 }
 
+# SCRIPT 3
 # DROP USER
-function Drop-User {
-    param (
-        [string]$Username
-    )
-
-    $User = Get-LocalUser -Name $Username
-    if ($User) {
-        Remove-LocalUser -Name $Username
-        Write-Host "Usuario $Username eliminado exitosamente."
-    } else {
-        Write-Host "Usuario $Username no encontrado."
-    }
+function eliminar_usuario {
+    read -p "Introduce el nombre de usuario: " username
+    sudo deluser --remove-home $username
+    echo "Usuario $username eliminado exitosamente."
 }
 
+# SCRIPT 4
 # NEW USER
-function CrearUsuario {
-    param (
-        [string]$Username,
-        [string]$Password
-    )
-
-    New-LocalUser -Name $Username -Password (ConvertTo-SecureString $Password -AsPlainText -Force) -FullName $Username -Description "Usuario creado por script"
-    Add-LocalGroupMember -Group "Users" -Member $Username
-    Write-Host "Usuario $Username creado exitosamente."
+function crear_usuario {
+    read -p "Introduce el nombre de usuario: " username
+    read -s -p "Introduce la contraseña: " password
+    echo
+    sudo useradd -m $username
+    echo "$username:$password" | sudo chpasswd
+    sudo usermod -aG sudo $username
+    echo "Usuario $username creado exitosamente."
 }
 
-function Show-Menu {
-    param (
-        [string]$Title = 'MENÚ PRINCIPAL'
-    )
-
-    Write-Host "====================="
-    Write-Host " $Title"
-    Write-Host "====================="
-    Write-Host "1. Listar Usuarios"
-    Write-Host "2. Cambiar Contraseña"
-    Write-Host "3. Eliminar Usuario"
-    Write-Host "4. Crear Usuario"
-    Write-Host "====================="
-    Write-Host "0. Salir"
-    Write-Host "====================="
+# MENÚ PRINCIPAL
+function mostrar_menu {
+    echo "====================="
+    echo " MENÚ PRINCIPAL"
+    echo "====================="
+    echo "1. Listar Usuarios"
+    echo "2. Cambiar Contraseña"
+    echo "3. Eliminar Usuario"
+    echo "4. Crear Usuario"
+    echo "====================="
+    echo "0. Salir"
+    echo "====================="
 }
 
-function Process-Option {
-    param (
-        [int]$Option
-    )
-
-    switch ($Option) {
-        1 { Get-ListUsers }
-        2 { 
-            $username = Read-Host "Introduce el nombre de usuario"
-            $newPassword = Read-Host "Introduce la nueva contraseña"
-            Cambiar-Contrasena -Username $username -NewPassword $newPassword
-        }
-        3 { 
-            $username = Read-Host "Introduce el nombre de usuario"
-            Drop-User -Username $username
-        }
-        4 { 
-            $username = Read-Host "Introduce el nombre de usuario"
-            $password = Read-Host "Introduce la contraseña"
-            CrearUsuario -Username $username -Password $password
-        }
-        0 { Write-Host "Saliendo del programa..."; exit }
-        default { Write-Host "Opción no válida. Inténtalo de nuevo." }
-    }
+function procesar_opcion {
+    case $1 in
+        1) listar_usuarios ;;
+        2) cambiar_contrasena ;;
+        3) eliminar_usuario ;;
+        4) crear_usuario ;;
+        0) echo "Saliendo del programa..."; exit 0 ;;
+        *) echo "Opción no válida. Inténtalo de nuevo." ;;
+    esac
 }
 
-function Validate-Selection {
-    param (
-        [string]$Selection
-    )
-
-    if ($Selection -match '^\d+$') {
-        return [int]$Selection
-    } else {
-        Write-Host "Entrada no válida. Por favor, introduce un número."
-        return $null
-    }
-}
-
-do {
-    Show-Menu
-    $selection = Read-Host "Selecciona una opción"
-    $validatedSelection = Validate-Selection -Selection $selection
-    if ($null -ne $validatedSelection) {
-        Process-Option -Option $validatedSelection
-    }
-} while ($validatedSelection -ne 0)
+while true; do
+    mostrar_menu
+    read -p "Selecciona una opción: " opcion
+    procesar_opcion $opcion
+done
