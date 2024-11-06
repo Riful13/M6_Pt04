@@ -1,15 +1,15 @@
 #!/bin/bash
 
-# Desactivar interrupciones con CTRL + C
+# Desactivar CTRL + C
 trap "" SIGINT
 
-# Directorio predeterminado para organizar (por defecto el actual)
+# Directorio para organizar (por defecto el actual)
 DIRECTORIO="${1:-$(pwd)}"
 
 # Subcarpetas para cada tipo de archivo
 declare -A CARPETAS=( ["Imágenes"]="Imágenes" ["Documentos"]="Documentos" ["Videos"]="Videos" ["Audios"]="Audios" ["Otros"]="Otros" )
 
-# Crear las carpetas necesarias en el directorio de trabajo
+# Crear las carpetas necesarias en el directorio indicado
 crear_carpetas() {
     for carpeta in "${CARPETAS[@]}"; do
         mkdir -p "$DIRECTORIO/$carpeta"
@@ -17,7 +17,7 @@ crear_carpetas() {
     echo "Carpetas creadas en $DIRECTORIO"
 }
 
-# Función para mover archivos a una subcarpeta específica
+# Función para mover archivos a cada carpeta según sus extensiones
 mover_archivo() {
     local archivo="$1"
     local destino="$2"
@@ -42,7 +42,7 @@ clasificar_archivos() {
     for archivo in "$DIRECTORIO"/*; do
         if [ -f "$archivo" ]; then
             case "${archivo,,}" in
-                *.jpg|*.jpeg|*.png|*.gif|*.bmp|*.tiff) mover_archivo "$archivo" "$DIRECTORIO/${CARPETAS[Imágenes]}" ;;
+                *.jpg|*.jpeg|*.png|*.gif|*.webp|*.bmp|*.tiff) mover_archivo "$archivo" "$DIRECTORIO/${CARPETAS[Imágenes]}" ;;
                 *.pdf|*.doc|*.docx|*.txt|*.xls|*.xlsx|*.ppt|*.pptx) mover_archivo "$archivo" "$DIRECTORIO/${CARPETAS[Documentos]}" ;;
                 *.mp4|*.avi|*.mkv|*.mov|*.flv) mover_archivo "$archivo" "$DIRECTORIO/${CARPETAS[Videos]}" ;;
                 *.mp3|*.wav|*.aac|*.flac) mover_archivo "$archivo" "$DIRECTORIO/${CARPETAS[Audios]}" ;;
@@ -78,7 +78,7 @@ limpiar_carpetas() {
 # Mostrar el menú
 mostrar_menu() {
     echo ""
-    echo "Organizador de Archivos - Menú"
+    echo "Organizador de archivos - Menú"
     echo "1. Crear carpetas de organización"
     echo "2. Clasificar archivos"
     echo "3. Mostrar contenido clasificado"
